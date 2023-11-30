@@ -1,10 +1,3 @@
-## 起動コマンド
-
-```
-pnpm install
-pnpm dev
-```
-
 ## UX
 
 ### データ構造
