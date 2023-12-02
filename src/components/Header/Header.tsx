@@ -1,8 +1,8 @@
 import styles from "@/styles/components/Header/Header.module.css";
 import { Navbar, NavbarBrand, NavbarContent } from "@nextui-org/react";
 import Link from "next/link";
-import { NetworkSelector } from "./NetworkSelector";
-import { SignInLink } from "./SingInLink";
+import { NetworkSelector } from "./components/NetworkSelector";
+import { SignInLink } from "./components/SingInLink";
 
 export const Header = () => {
   return (

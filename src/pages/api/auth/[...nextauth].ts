@@ -1,3 +1,4 @@
+import { SupabaseAdapter } from "@auth/supabase-adapter";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from "next-auth/react";
@@ -28,10 +29,11 @@ export default async function auth(req: any, res: any) {
           );
           const nextAuthUrl = new URL(process.env.NEXTAUTH_URL!);
 
+          const nonce = await getCsrfToken({ req: { headers: req.headers } });
           const result = await siwe.verify({
             signature: credentials?.signature || "",
             domain: nextAuthUrl.host,
-            nonce: await getCsrfToken({ req }),
+            nonce,
           });
 
           if (result.success) {
@@ -41,6 +43,7 @@ export default async function auth(req: any, res: any) {
           }
           return null;
         } catch (e) {
+          console.error(e);
           return null;
         }
       },
@@ -55,8 +58,12 @@ export default async function auth(req: any, res: any) {
     providers.pop();
   }
 
-  return await NextAuth(req, res, {
+  const auth = await NextAuth(req, res, {
     // https://next-auth.js.org/configuration/providers/oauth
+    adapter: SupabaseAdapter({
+      url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    }),
     providers,
     session: {
       strategy: "jwt",
@@ -70,4 +77,5 @@ export default async function auth(req: any, res: any) {
       },
     },
   });
+  return auth;
 }

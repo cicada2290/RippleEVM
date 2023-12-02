@@ -19,7 +19,7 @@ const config = createConfig({
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <SessionProvider>
+    <SessionProvider session={pageProps.session}>
       <WagmiConfig config={config}>
         <NextUIProvider>
           <Header />
