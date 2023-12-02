@@ -11,11 +11,15 @@
   },
   "dependencies": {
     "@nextui-org/react": "^2.2.9",
+    "ethers": "^6.9.0",
     "framer-motion": "^10.16.9",
     "jotai": "^2.6.0",
     "next": "14.0.3",
+    "next-auth": "^4.24.5",
     "react": "^18",
     "react-dom": "^18",
+    "siwe": "^2.1.4",
+    "wagmi": "^1.4.7",
     "xrpl": "^2.14.0"
   },
   "devDependencies": {
