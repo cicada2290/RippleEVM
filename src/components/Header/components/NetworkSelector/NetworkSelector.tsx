@@ -16,7 +16,7 @@ export const NetworkSelector = () => {
       }
     >
       <SelectSection title="XRPL">
-        {NETWORKS.map((network) => (
+        {NETWORKS.filter((n) => n.type === "xrpl").map((network) => (
           <SelectItem key={network.name} value={network.name}>
             {network.name}
           </SelectItem>
