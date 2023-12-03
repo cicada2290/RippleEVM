@@ -21,8 +21,13 @@ export const BalanceViewer: FC<Props> = ({ xrplAddress }) => {
       const client = new Client(network.url);
       await client.connect();
 
-      const balance = await client.getXrpBalance(xrplAddress);
-      setBalance(Number(balance));
+      try {
+        const balance = await client.getXrpBalance(xrplAddress);
+        setBalance(Number(balance));
+      } catch (e: any) {
+        setBalance(0);
+        console.error(e.message);
+      }
 
       await client.disconnect();
     };
@@ -38,8 +43,8 @@ export const BalanceViewer: FC<Props> = ({ xrplAddress }) => {
         target="_blank"
       >
         <Button radius="full" color="primary" variant="flat">
-          <LinkIcon />
           {xrplAddress}
+          <LinkIcon />
         </Button>
       </Link>
       <div className={styles.balance}>{balance} XRP</div>

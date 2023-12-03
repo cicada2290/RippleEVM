@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@auth/supabase-adapter": "^0.1.10",
+    "@heroicons/react": "^2.0.18",
     "@nextui-org/react": "^2.2.9",
     "@supabase/supabase-js": "^2.39.0",
     "ethers": "^6.9.0",

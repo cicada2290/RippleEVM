@@ -7,6 +7,7 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
+  LinkIcon,
 } from "@nextui-org/react";
 import { useAtom } from "jotai";
 import { signOut, useSession } from "next-auth/react";
@@ -54,7 +55,10 @@ export const SignInLink = () => {
                     height={32}
                   />
                 </div>
-                <div>{(session as Session).user?.evmAddress}</div>
+                <div>
+                  {(session as Session).user?.evmAddress}
+                  <LinkIcon />
+                </div>
               </div>
             </DropdownItem>
             <DropdownItem
@@ -73,8 +77,9 @@ export const SignInLink = () => {
                     height={32}
                   />
                 </div>
-                <div className={styles["dropdown-item"]}>
-                  <div>{(session as Session).user?.xrplAddress}</div>
+                <div className="flex">
+                  {(session as Session).user?.xrplAddress}
+                  <LinkIcon />
                 </div>
               </div>
             </DropdownItem>
