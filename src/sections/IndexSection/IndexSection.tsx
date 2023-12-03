@@ -1,3 +1,9 @@
+import { BalanceViewer } from "./components/BalanceViewer";
+
 export const IndexSection = () => {
-  return <div></div>;
+  return (
+    <div>
+      <BalanceViewer />
+    </div>
+  );
 };
