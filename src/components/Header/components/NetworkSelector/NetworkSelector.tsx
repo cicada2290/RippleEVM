@@ -15,7 +15,7 @@ export const NetworkSelector = () => {
         setNetwork(NETWORKS.find((n) => n.name === e.target.value)!)
       }
     >
-      <SelectSection title="XRP">
+      <SelectSection title="XRPL">
         {NETWORKS.map((network) => (
           <SelectItem key={network.name} value={network.name}>
             {network.name}

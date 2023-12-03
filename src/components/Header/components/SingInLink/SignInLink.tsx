@@ -49,7 +49,7 @@ export const SignInLink = () => {
               <div className={styles["dropdown-item"]}>
                 <div>
                   <Image
-                    src="images/logo/ethereum-eth-logo.svg"
+                    src="/images/logo/ethereum-eth-logo.svg"
                     alt="Ethereum"
                     width={32}
                     height={32}
@@ -71,7 +71,7 @@ export const SignInLink = () => {
               <div className={styles["dropdown-item"]}>
                 <div>
                   <Image
-                    src="images/logo/x.svg"
+                    src="/images/logo/x.svg"
                     alt="Xrpl"
                     width={32}
                     height={32}
