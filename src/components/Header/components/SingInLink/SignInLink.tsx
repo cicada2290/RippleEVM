@@ -31,22 +31,14 @@ export const SignInLink = () => {
               isFocusable={true}
             />
           </DropdownTrigger>
-          <DropdownMenu
-            className={styles["dropdown-menu"]}
-            onAction={(key) => {
-              switch (key) {
-                case "delete":
-                  signOut();
-                  break;
-              }
-            }}
-          >
-            <DropdownItem
-              key="evm"
-              href={`https://etherscan.io/address/${(session as Session).user
-                ?.evmAddress}`}
-            >
-              <div className={styles["dropdown-item"]}>
+          <DropdownMenu className={styles["dropdown-menu"]}>
+            <DropdownItem key="evm">
+              <a
+                className={styles["dropdown-item"]}
+                href={`https://etherscan.io/address/${(session as Session).user
+                  ?.evmAddress}`}
+                target="_blank"
+              >
                 <div>
                   <Image
                     src="/images/logo/ethereum-eth-logo.svg"
@@ -59,16 +51,17 @@ export const SignInLink = () => {
                   {(session as Session).user?.evmAddress}
                   <LinkIcon />
                 </div>
-              </div>
+              </a>
             </DropdownItem>
-            <DropdownItem
-              key="xrpl"
-              href={path.join(
-                network.explorer,
-                `accounts/${(session as Session).user?.xrplAddress}`,
-              )}
-            >
-              <div className={styles["dropdown-item"]}>
+            <DropdownItem key="xrpl">
+              <a
+                className={styles["dropdown-item"]}
+                href={path.join(
+                  network.explorer,
+                  `accounts/${(session as Session).user?.xrplAddress}`,
+                )}
+                target="_blank"
+              >
                 <div>
                   <Image
                     src="/images/logo/x.svg"
@@ -81,9 +74,14 @@ export const SignInLink = () => {
                   {(session as Session).user?.xrplAddress}
                   <LinkIcon />
                 </div>
-              </div>
+              </a>
             </DropdownItem>
-            <DropdownItem key="delete" className="text-danger" color="danger">
+            <DropdownItem
+              key="delete"
+              className="text-danger"
+              color="danger"
+              onClick={() => signOut()}
+            >
               ログアウト
             </DropdownItem>
           </DropdownMenu>
