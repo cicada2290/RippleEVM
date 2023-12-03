@@ -1,6 +1,6 @@
 import { ExtendedSpinner } from "@/components/ExtendedSpinner/ExtendedSpinner";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { BalanceViewer } from "./components/BalanceViewer";
 import { WalletPrompt } from "./components/WalletPrompt";
 

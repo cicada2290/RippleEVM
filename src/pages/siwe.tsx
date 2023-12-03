@@ -1,7 +1,7 @@
 import styles from "@/styles/pages/Siwe.module.css";
 import { Button, Spinner } from "@nextui-org/react";
 import { getCsrfToken, signIn, useSession } from "next-auth/react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
 import { SiweMessage } from "siwe";
 import { useAccount, useConnect, useNetwork, useSignMessage } from "wagmi";

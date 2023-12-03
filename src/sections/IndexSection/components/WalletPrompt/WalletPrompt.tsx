@@ -5,6 +5,7 @@ import styles from "@/styles/sections/IndexSection/components/WalletPrompt/Walle
 import { Button, Chip, Input } from "@nextui-org/react";
 import { HDNodeWallet, Mnemonic } from "ethers";
 import { useAtom } from "jotai";
+import { useRouter } from "next/navigation";
 import { FC, FormEventHandler, useMemo, useState } from "react";
 import { Client, Wallet } from "xrpl";
 
@@ -85,7 +86,7 @@ export const WalletPrompt: FC<Props> = ({ evmAddress }) => {
 
         setIsLoading(false);
 
-        router.reload();
+        router.refresh();
       } catch (e: any) {
         console.error(e.message);
       }
