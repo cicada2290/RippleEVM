@@ -1,5 +1,5 @@
 import { networkAtom } from "@/components/atoms";
-import { NETWORKS } from "@/data/networks";
+import { NETWORKS } from "@/data/const/networks";
 import { Select, SelectItem, SelectSection } from "@nextui-org/react";
 import { useAtom } from "jotai";
 

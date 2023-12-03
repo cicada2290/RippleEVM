@@ -1,3 +1,14 @@
 .avatar {
     cursor: pointer;
 }
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    column-gap: 0.5rem;
+}
+
+.dropdown-item img {
+    width: 1.2rem;
+    height: 1.2rem;
+}
