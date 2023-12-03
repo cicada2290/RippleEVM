@@ -4,7 +4,7 @@ import { ExtendedSpinner } from "@/components/ExtendedSpinner/ExtendedSpinner";
 import { NETWORKS } from "@/data/const/networks";
 import { Balance } from "@/scripts/types/Balance";
 import styles from "@/styles/sections/EvmSection/EvmSection.module.css";
-import { Card, Divider } from "@nextui-org/react";
+import { Card, Divider, Skeleton } from "@nextui-org/react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -107,23 +107,27 @@ export const EvmSection = () => {
               height={32}
             />
           </div>
-          {xrplAddress}
+          {xrplAddress || <Skeleton />}
         </div>
       </div>
       <Divider />
       <div className={styles["balances-container"]}>
         <Card>
           <div className={styles["balances"]}>
-            {balances.map((balance) => (
-              <div key={balance.networkName}>
-                <div className={styles["network-name"]}>
-                  {balance.networkName}
+            {balances.length > 0 ? (
+              balances.map((balance) => (
+                <div key={balance.networkName}>
+                  <div className={styles["network-name"]}>
+                    {balance.networkName}
+                  </div>
+                  <div>
+                    {balance.balance} {balance.currency}
+                  </div>
                 </div>
-                <div>
-                  {balance.balance} {balance.currency}
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <Skeleton />
+            )}
           </div>
         </Card>
       </div>
