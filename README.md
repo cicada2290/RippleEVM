@@ -8,7 +8,7 @@
 - [x] EVMウォレットアドレスによるXRPLウォレットアドレスの検索
 - [ ] XRPLウォレットアドレスによるEVMウォレットアドレスの検索
 - [ ] EVMウォレットアドレスによるXRPLウォレットアドレスへXRPの送金
-- [ ] EVMチェーン（Ethereum, Sepolia, Polygon）上でのトークン残高表示
+- [ ] EVMチェーン（Ethereum, Sepolia, Polygon）上のトークン残高表示
 
 ## UX
 
