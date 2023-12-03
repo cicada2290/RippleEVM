@@ -1,0 +1,23 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    row-gap:1rem;
+    padding: 2rem 0;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.5rem;
+}
+
+.submit-button {
+    width: 100%;
+}
+
+.mnemonic-inputs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+}

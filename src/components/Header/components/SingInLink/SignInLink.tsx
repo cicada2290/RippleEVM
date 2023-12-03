@@ -11,7 +11,7 @@ import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 
 export const SignInLink = () => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   if (session?.user) {
     return (
@@ -44,7 +44,9 @@ export const SignInLink = () => {
 
   return (
     <Link href="/siwe">
-      <Button color="primary">ログイン</Button>
+      <Button isLoading={status === "loading"} color="primary">
+        ログイン
+      </Button>
     </Link>
   );
 };

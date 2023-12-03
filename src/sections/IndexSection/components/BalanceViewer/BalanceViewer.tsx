@@ -1,59 +1,45 @@
 "use client";
 
-import { Center } from "@/components/Center";
 import { networkAtom } from "@/components/atoms";
 import styles from "@/styles/sections/IndexSection/components/BalanceViewer/BalanceViewer.module.css";
-import { Button, LinkIcon, Spinner } from "@nextui-org/react";
+import { Button, LinkIcon } from "@nextui-org/react";
 import { useAtom } from "jotai";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import path from "path";
-import { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Client } from "xrpl";
 
-export const BalanceViewer = () => {
+type Props = {
+  xrplAddress: string;
+};
+export const BalanceViewer: FC<Props> = ({ xrplAddress }) => {
   const [network, _] = useAtom(networkAtom);
   const [balance, setBalance] = useState(0);
-
-  const { data: session } = useSession();
 
   useEffect(() => {
     const fetchXrpBalance = async () => {
       const client = new Client(network.url);
       await client.connect();
 
-      const balance = await client.getXrpBalance(
-        (session as Session).user.xrplAddress,
-      );
+      const balance = await client.getXrpBalance(xrplAddress);
       setBalance(Number(balance));
 
       await client.disconnect();
     };
-    if ((session as Session)?.user?.xrplAddress) {
+    if (xrplAddress) {
       fetchXrpBalance();
     }
-  }, [network.url, session]);
-
-  if (!session) {
-    return (
-      <Center>
-        <Spinner />
-      </Center>
-    );
-  }
+  }, [network.url, xrplAddress]);
 
   return (
     <div className={styles.container}>
       <Link
-        href={path.join(
-          network.explorer,
-          `accounts/${(session as Session).user.xrplAddress}`,
-        )}
+        href={path.join(network.explorer, `accounts/${xrplAddress}`)}
         target="_blank"
       >
         <Button radius="full" color="primary" variant="flat">
           <LinkIcon />
-          {(session as Session).user.xrplAddress}
+          {xrplAddress}
         </Button>
       </Link>
       <div className={styles.balance}>{balance} XRP</div>

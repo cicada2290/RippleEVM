@@ -1,4 +1,3 @@
-import { SupabaseAdapter } from "@auth/supabase-adapter";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from "next-auth/react";
@@ -61,10 +60,6 @@ export default async function auth(req: any, res: any) {
 
   const auth = await NextAuth(req, res, {
     // https://next-auth.js.org/configuration/providers/oauth
-    adapter: SupabaseAdapter({
-      url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    }),
     providers,
     session: {
       strategy: "jwt",
@@ -74,7 +69,10 @@ export default async function auth(req: any, res: any) {
       async session({ session, token }: { session: any; token: any }) {
         session.user.evmAddress = token.sub;
         session.user.xrplAddress = await fetch(
-          path.join(process.env.NEXTAUTH_URL!, "api/user/xrpl-wallet"),
+          path.join(
+            process.env.NEXTAUTH_URL!,
+            `api/user/xrpl-address?evmAddress=${token.sub}`,
+          ),
         )
           .then((r) => r.json())
           .then((r) => r.data);
