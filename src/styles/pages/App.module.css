@@ -1,0 +1,10 @@
+.container {
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+}
+
+.content {
+    width: 100%;
+    max-width: 36rem;
+}

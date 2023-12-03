@@ -1,8 +1,13 @@
 "use client";
 
+import { Center } from "@/components/Center";
 import { networkAtom } from "@/components/atoms";
+import styles from "@/styles/sections/IndexSection/components/BalanceViewer/BalanceViewer.module.css";
+import { Button, LinkIcon, Spinner } from "@nextui-org/react";
 import { useAtom } from "jotai";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
+import path from "path";
 import { useEffect, useState } from "react";
 import { Client } from "xrpl";
 
@@ -29,5 +34,29 @@ export const BalanceViewer = () => {
     }
   }, [network.url, session]);
 
-  return <div>{balance}</div>;
+  if (!session) {
+    return (
+      <Center>
+        <Spinner />
+      </Center>
+    );
+  }
+
+  return (
+    <div className={styles.container}>
+      <Link
+        href={path.join(
+          network.explorer,
+          `accounts/${(session as Session).user.xrplAddress}`,
+        )}
+        target="_blank"
+      >
+        <Button radius="full" color="primary" variant="flat">
+          <LinkIcon />
+          {(session as Session).user.xrplAddress}
+        </Button>
+      </Link>
+      <div className={styles.balance}>{balance} XRP</div>
+    </div>
+  );
 };

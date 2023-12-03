@@ -2,6 +2,7 @@ import { SupabaseAdapter } from "@auth/supabase-adapter";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from "next-auth/react";
+import path from "path";
 import { SiweMessage } from "siwe";
 
 // For more information on each option (and a full list of options) go to
@@ -73,7 +74,7 @@ export default async function auth(req: any, res: any) {
       async session({ session, token }: { session: any; token: any }) {
         session.user.evmAddress = token.sub;
         session.user.xrplAddress = await fetch(
-          `${process.env.NEXTAUTH_URL}/api/user/xrpl-wallet`,
+          path.join(process.env.NEXTAUTH_URL!, "api/user/xrpl-wallet"),
         )
           .then((r) => r.json())
           .then((r) => r.data);
