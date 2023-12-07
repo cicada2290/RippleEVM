@@ -1,10 +1,9 @@
 "use client";
 
-import { ExtendedSkeleton } from "@/components/ExtendedSkeleton";
 import { NETWORKS } from "@/data/const/networks";
-import { Balance } from "@/scripts/types/Balance";
+import { Network } from "@/scripts/types/Network";
 import styles from "@/styles/sections/components/UserDetail/UserDetail.module.css";
-import { Card, Divider, Image } from "@nextui-org/react";
+import { Card, Divider, Image, Link, Skeleton } from "@nextui-org/react";
 import { fetchBalance } from "@wagmi/core";
 import { FC, useEffect, useState } from "react";
 import { Client } from "xrpl";
@@ -14,48 +13,63 @@ type Props = {
   xrplAddress: string | null;
 };
 export const UserDetail: FC<Props> = ({ evmAddress, xrplAddress }) => {
-  const [balances, setBalances] = useState<Balance[]>([]);
+  const [balances, setBalances] = useState<
+    { network: Network; balance: number | null }[]
+  >(
+    NETWORKS.map((network) => ({
+      network,
+      balance: null,
+    })),
+  );
 
   useEffect(() => {
     const fetchBalances = async () => {
-      const _balances = [] as Balance[];
-
-      for (const network of NETWORKS) {
-        switch (network.type) {
-          case "evm":
-            if (evmAddress) {
-              const response = await fetchBalance({
-                address: evmAddress,
-                chainId: network.chainId,
-              });
-              _balances.push({
-                balance: Number(response.formatted),
-                currency: "ETH",
-                networkName: network.name,
-              });
-            }
-            break;
-          case "xrpl":
-            if (xrplAddress) {
-              const client = new Client(network.url);
-              try {
-                const balance = await client.getXrpBalance(xrplAddress);
-                _balances.push({
-                  balance: Number(balance),
-                  currency: "XRP",
-                  networkName: network.name,
+      const _balances = await Promise.all(
+        NETWORKS.map(async (network) => {
+          switch (network.type) {
+            case "evm":
+              if (evmAddress) {
+                const response = await fetchBalance({
+                  address: evmAddress,
+                  chainId: network.chainId,
                 });
-              } catch (e: any) {
-                _balances.push({
-                  balance: 0,
-                  currency: "XRP",
-                  networkName: network.name,
-                });
+                return {
+                  network,
+                  balance: Number(response.formatted),
+                };
+              } else {
+                return {
+                  balance: null,
+                  network,
+                };
               }
-            }
-            break;
-        }
-      }
+            default:
+              if (xrplAddress) {
+                const client = new Client(network.url);
+                try {
+                  await client.connect();
+                  const xrplBalance = await client.getXrpBalance(xrplAddress);
+                  await client.disconnect();
+
+                  return {
+                    balance: Number(xrplBalance),
+                    network,
+                  };
+                } catch (e: any) {
+                  return {
+                    balance: 0,
+                    network,
+                  };
+                }
+              } else {
+                return {
+                  balance: null,
+                  network,
+                };
+              }
+          }
+        }),
+      );
 
       setBalances(_balances);
     };
@@ -67,16 +81,24 @@ export const UserDetail: FC<Props> = ({ evmAddress, xrplAddress }) => {
     <div className={styles.container}>
       <div className={styles["addresses-container"]}>
         <div className={styles["address-container"]}>
-          <div>
-            <Image src="/images/logo/ethereum-eth-logo.svg" alt="Ethereum" />
-          </div>
-          <div>{evmAddress || <ExtendedSkeleton />}</div>
+          <Image src="/images/logo/ethereum-eth-logo.svg" alt="Ethereum" />
+          <Link
+            href={`https://sepolia.etherscan.io/address/${evmAddress}`}
+            isExternal={true}
+            showAnchorIcon={true}
+          >
+            {evmAddress}
+          </Link>
         </div>
         <div className={styles["address-container"]}>
-          <div>
-            <Image src="/images/logo/x.svg" alt="Ethereum" />
-          </div>
-          {xrplAddress || <ExtendedSkeleton />}
+          <Image src="/images/logo/x.svg" alt="Ethereum" />
+          <Link
+            href={`https://testnet.xrpl.org/accounts/${xrplAddress}`}
+            isExternal={true}
+            showAnchorIcon={true}
+          >
+            {xrplAddress}
+          </Link>
         </div>
       </div>
       <Divider />
@@ -84,12 +106,16 @@ export const UserDetail: FC<Props> = ({ evmAddress, xrplAddress }) => {
         <Card>
           <div className={styles["balances"]}>
             {balances.map((balance) => (
-              <div key={balance.networkName}>
+              <div key={balance.network.name}>
                 <div className={styles["network-name"]}>
-                  {balance.networkName}
+                  {balance.network.name}
                 </div>
                 <div>
-                  {balance.balance || 0} {balance.currency}
+                  {balance.balance === null ? (
+                    <Skeleton className={styles["balance-skeleton"]} />
+                  ) : (
+                    `${balance.balance} ${balance.network.currency}`
+                  )}
                 </div>
               </div>
             ))}

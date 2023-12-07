@@ -39,12 +39,10 @@ export const SignInLink = () => {
                   ?.evmAddress}`}
                 target="_blank"
               >
-                <div>
-                  <Image
-                    src="/images/logo/ethereum-eth-logo.svg"
-                    alt="Ethereum"
-                  />
-                </div>
+                <Image
+                  src="/images/logo/ethereum-eth-logo.svg"
+                  alt="Ethereum"
+                />
                 <div>
                   {(session as Session).user?.evmAddress}
                   <LinkIcon />
@@ -60,9 +58,7 @@ export const SignInLink = () => {
                 )}
                 target="_blank"
               >
-                <div>
-                  <Image src="/images/logo/x.svg" alt="Xrpl" />
-                </div>
+                <Image src="/images/logo/x.svg" alt="Xrpl" />
                 <div className="flex">
                   {(session as Session).user?.xrplAddress}
                   <LinkIcon />

@@ -2,7 +2,7 @@
 
 import { networkAtom } from "@/components/atoms";
 import styles from "@/styles/sections/IndexSection/components/BalanceViewer/BalanceViewer.module.css";
-import { Button, LinkIcon } from "@nextui-org/react";
+import { Button, LinkIcon, Skeleton } from "@nextui-org/react";
 import { fetchBalance } from "@wagmi/core";
 import { useAtom } from "jotai";
 import Link from "next/link";
@@ -16,31 +16,34 @@ type Props = {
 };
 export const BalanceViewer: FC<Props> = ({ evmAddress, xrplAddress }) => {
   const [network, _] = useAtom(networkAtom);
-  const [balance, setBalance] = useState(0);
+  const [balance, setBalance] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchMyBalance = async () => {
-      setBalance(0);
+      setBalance(null);
+      try {
+        if (network.type === "xrpl") {
+          const client = new Client(network.url);
+          await client.connect();
 
-      if (network.type === "xrpl") {
-        const client = new Client(network.url);
-        await client.connect();
+          try {
+            const balance = await client.getXrpBalance(xrplAddress);
+            setBalance(Number(balance));
+          } catch (e: any) {
+            setBalance(0);
+            console.error(e.message);
+          }
 
-        try {
-          const balance = await client.getXrpBalance(xrplAddress);
-          setBalance(Number(balance));
-        } catch (e: any) {
-          setBalance(0);
-          console.error(e.message);
+          await client.disconnect();
+        } else {
+          const response = await fetchBalance({
+            address: evmAddress,
+            chainId: network.chainId,
+          });
+          setBalance(Number(response.formatted));
         }
-
-        await client.disconnect();
-      } else {
-        const response = await fetchBalance({
-          address: evmAddress,
-          chainId: network.chainId,
-        });
-        setBalance(Number(response.formatted));
+      } catch (e: any) {
+        setBalance(0);
       }
     };
 
@@ -56,13 +59,17 @@ export const BalanceViewer: FC<Props> = ({ evmAddress, xrplAddress }) => {
         target="_blank"
       >
         <Button radius="full" color="primary" variant="flat">
-          {xrplAddress}
+          {network.type === "evm" ? evmAddress : xrplAddress}
           <LinkIcon />
         </Button>
       </Link>
-      <div className={styles.balance}>
-        {balance} {network.currency}
-      </div>
+      {balance === null ? (
+        <Skeleton className={styles["balance-skeleton"]} />
+      ) : (
+        <div className={styles.balance}>
+          {balance} {network.currency}
+        </div>
+      )}
     </div>
   );
 };

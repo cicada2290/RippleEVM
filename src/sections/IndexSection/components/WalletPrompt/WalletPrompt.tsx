@@ -1,12 +1,13 @@
 "use client";
 
 import { networkAtom } from "@/components/atoms";
+import { NETWORKS } from "@/data/const/networks";
 import styles from "@/styles/sections/IndexSection/components/WalletPrompt/WalletPrompt.module.css";
 import { Button, Chip, Input } from "@nextui-org/react";
 import { HDNodeWallet, Mnemonic } from "ethers";
 import { useAtom } from "jotai";
 import { useRouter } from "next/navigation";
-import { FC, FormEventHandler, useMemo, useState } from "react";
+import { FC, FormEventHandler, useEffect, useMemo, useState } from "react";
 import { Client, Wallet } from "xrpl";
 
 type Props = {
@@ -15,7 +16,7 @@ type Props = {
 export const WalletPrompt: FC<Props> = ({ evmAddress }) => {
   const router = useRouter();
 
-  const [network, _] = useAtom(networkAtom);
+  const [network, setNetwork] = useAtom(networkAtom);
 
   const [mnemonic, setMnemonic] = useState([
     "",
@@ -59,7 +60,7 @@ export const WalletPrompt: FC<Props> = ({ evmAddress }) => {
       evmWallet.publicKey.toUpperCase()
     ) {
       setArePrivateKeysEqual(false);
-    } else {
+    } else if (network.type === "xrpl") {
       try {
         setArePrivateKeysEqual(true);
 
@@ -92,6 +93,12 @@ export const WalletPrompt: FC<Props> = ({ evmAddress }) => {
       }
     }
   };
+
+  useEffect(() => {
+    if (network.type !== "xrpl") {
+      setNetwork(NETWORKS[0]);
+    }
+  }, [network.type, setNetwork]);
 
   return (
     <div className={styles.container}>

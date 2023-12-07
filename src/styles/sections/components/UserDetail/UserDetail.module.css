@@ -33,3 +33,10 @@
     font-weight: 700;
     color: #666;
 }
+
+.balance-skeleton {
+    width: 10rem;
+    height: 1rem;
+    border-radius: 0.25rem;
+    margin-top: 0.5rem;
+}
