@@ -1,0 +1,1 @@
+export { ExtendedSkeleton } from "./ExtendedSkeleton";

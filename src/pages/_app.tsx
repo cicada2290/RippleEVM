@@ -3,6 +3,7 @@ import "@/styles/globals.css";
 import styles from "@/styles/pages/App.module.css";
 import { NextUIProvider } from "@nextui-org/react";
 import { SessionProvider } from "next-auth/react";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 import type { AppProps } from "next/app";
 import { WagmiConfig, configureChains, createConfig, mainnet } from "wagmi";
 import { arbitrum, optimism, polygon } from "wagmi/chains";
@@ -23,12 +24,14 @@ export default function App({ Component, pageProps }: AppProps) {
     <SessionProvider session={pageProps.session}>
       <WagmiConfig config={config}>
         <NextUIProvider>
-          <Header />
-          <div className={styles.container}>
-            <div className={styles.content}>
-              <Component {...pageProps} />
+          <NextThemesProvider attribute="class" defaultTheme="light">
+            <Header />
+            <div className={styles.container}>
+              <div className={styles.content}>
+                <Component {...pageProps} />
+              </div>
             </div>
-          </div>
+          </NextThemesProvider>
         </NextUIProvider>
       </WagmiConfig>
     </SessionProvider>

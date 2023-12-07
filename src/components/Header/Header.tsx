@@ -2,7 +2,7 @@ import styles from "@/styles/components/Header/Header.module.css";
 import { Navbar, NavbarBrand, NavbarContent } from "@nextui-org/react";
 import Link from "next/link";
 import { NetworkSelector } from "./components/NetworkSelector";
-import { SearchBox } from "./components/SearchBox/SearchBox";
+import { SearchBox } from "./components/SearchBox";
 import { SignInLink } from "./components/SingInLink";
 
 export const Header = () => {

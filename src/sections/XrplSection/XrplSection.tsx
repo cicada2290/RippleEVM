@@ -3,44 +3,45 @@
 import { ExtendedSpinner } from "@/components/ExtendedSpinner/ExtendedSpinner";
 import { NETWORKS } from "@/data/const/networks";
 import { Balance } from "@/scripts/types/Balance";
+import { isAddress } from "ethers";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Client, isValidAddress } from "xrpl";
+import { Client } from "xrpl";
 import { UserDetail } from "../components/UserDetail/UserDetail";
 
-export const EvmSection = () => {
-  const [xrplAddress, setXrplAddress] = useState<string | null>(null);
+export const XrplSection = () => {
+  const [evmAddress, setEvmAddress] = useState<string | null>(null);
   const [balances, setBalances] = useState<Balance[]>([]);
 
   const params = useParams();
-  const evmAddress = params?.address as unknown as string;
+  const xrplAddress = params?.address as unknown as string;
 
   useEffect(() => {
-    const fetchXrplAddress = async () => {
+    const fetchEvmAddress = async () => {
       if (params && params.address) {
         const response = await fetch(
-          `/api/user/xrpl-address?evmAddress=${params.address}`,
+          `/api/user/evm-address?xrplAddress=${params.address}`,
         );
         if (!response.ok) {
-          setXrplAddress("");
+          setEvmAddress("");
           return;
         }
 
         const json = await response.json();
-        if (isValidAddress(json.data)) {
-          setXrplAddress(json.data);
+        if (isAddress(json.data)) {
+          setEvmAddress(json.data);
         } else {
-          setXrplAddress("");
+          setEvmAddress("");
         }
       }
     };
 
-    fetchXrplAddress();
+    fetchEvmAddress();
   }, [params]);
 
   useEffect(() => {
     const fetchBalances = async () => {
-      if (xrplAddress) {
+      if (evmAddress && xrplAddress) {
         const _balances = [] as Balance[];
 
         for (const network of NETWORKS) {
@@ -79,7 +80,7 @@ export const EvmSection = () => {
     fetchBalances();
   }, [evmAddress, xrplAddress]);
 
-  if (!params || !evmAddress) {
+  if (!params || !xrplAddress) {
     return <ExtendedSpinner />;
   }
 
