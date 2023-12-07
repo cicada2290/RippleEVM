@@ -1,19 +1,68 @@
+"use client";
+
 import { ExtendedSkeleton } from "@/components/ExtendedSkeleton";
+import { NETWORKS } from "@/data/const/networks";
 import { Balance } from "@/scripts/types/Balance";
 import styles from "@/styles/sections/components/UserDetail/UserDetail.module.css";
 import { Card, Divider, Image } from "@nextui-org/react";
-import { FC } from "react";
+import { fetchBalance } from "@wagmi/core";
+import { FC, useEffect, useState } from "react";
+import { Client } from "xrpl";
 
 type Props = {
-  evmAddress: string | null;
+  evmAddress: `0x${string}` | null;
   xrplAddress: string | null;
-  balances: Balance[];
 };
-export const UserDetail: FC<Props> = ({
-  evmAddress,
-  xrplAddress,
-  balances,
-}) => {
+export const UserDetail: FC<Props> = ({ evmAddress, xrplAddress }) => {
+  const [balances, setBalances] = useState<Balance[]>([]);
+
+  useEffect(() => {
+    const fetchBalances = async () => {
+      const _balances = [] as Balance[];
+
+      for (const network of NETWORKS) {
+        switch (network.type) {
+          case "evm":
+            if (evmAddress) {
+              const response = await fetchBalance({
+                address: evmAddress,
+                chainId: network.chainId,
+              });
+              _balances.push({
+                balance: Number(response.formatted),
+                currency: "ETH",
+                networkName: network.name,
+              });
+            }
+            break;
+          case "xrpl":
+            if (xrplAddress) {
+              const client = new Client(network.url);
+              try {
+                const balance = await client.getXrpBalance(xrplAddress);
+                _balances.push({
+                  balance: Number(balance),
+                  currency: "XRP",
+                  networkName: network.name,
+                });
+              } catch (e: any) {
+                _balances.push({
+                  balance: 0,
+                  currency: "XRP",
+                  networkName: network.name,
+                });
+              }
+            }
+            break;
+        }
+      }
+
+      setBalances(_balances);
+    };
+
+    fetchBalances();
+  }, [evmAddress, xrplAddress]);
+
   return (
     <div className={styles.container}>
       <div className={styles["addresses-container"]}>

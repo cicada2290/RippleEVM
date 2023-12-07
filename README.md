@@ -8,7 +8,7 @@
 - [x] EVMウォレットアドレスによるXRPLウォレットアドレスの検索
 - [x] XRPLウォレットアドレスによるEVMウォレットアドレスの検索
 - [ ] EVMウォレットアドレスによるXRPLウォレットアドレスへXRPの送金
-- [ ] EVMチェーン（Sepolia, Mumbai）上のトークン残高表示
+- [x] EVMチェーン（Sepolia, Mumbai）上のトークン残高表示
 
 ## UX
 

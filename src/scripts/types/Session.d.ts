@@ -3,7 +3,7 @@ import { DefaultSession } from "next-auth";
 declare global {
   type Session = DefaultSession & {
     user: {
-      evmAddress: string;
+      evmAddress: `0x${string}`;
       xrplAddress: string;
     };
   };

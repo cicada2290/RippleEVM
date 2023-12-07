@@ -24,7 +24,10 @@ export const IndexSection = () => {
 
   return (
     <div>
-      <BalanceViewer xrplAddress={(session as Session).user.xrplAddress} />
+      <BalanceViewer
+        evmAddress={(session as Session).user.evmAddress}
+        xrplAddress={(session as Session).user.xrplAddress}
+      />
     </div>
   );
 };

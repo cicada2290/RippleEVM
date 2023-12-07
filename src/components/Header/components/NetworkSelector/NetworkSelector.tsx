@@ -22,6 +22,13 @@ export const NetworkSelector = () => {
           </SelectItem>
         ))}
       </SelectSection>
+      <SelectSection title="EVM">
+        {NETWORKS.filter((n) => n.type === "evm").map((network) => (
+          <SelectItem key={network.name} value={network.name}>
+            {network.name}
+          </SelectItem>
+        ))}
+      </SelectSection>
     </Select>
   );
 };
