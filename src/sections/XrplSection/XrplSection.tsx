@@ -3,10 +3,12 @@
 import { isAddress } from "ethers";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { UserDetail } from "../components/UserDetail/UserDetail";
+import { UserDetail } from "../components/UserDetail";
 
 export const XrplSection = () => {
-  const [evmAddress, setEvmAddress] = useState<string | null>(null);
+  const [evmAddress, setEvmAddress] = useState<
+    `0x${string}` | null | undefined
+  >(null);
 
   const params = useParams();
   const xrplAddress = params?.address as unknown as string;
@@ -18,7 +20,7 @@ export const XrplSection = () => {
           `/api/user/evm-address?xrplAddress=${params.address}`,
         );
         if (!response.ok) {
-          setEvmAddress("");
+          setEvmAddress(undefined);
           return;
         }
 
@@ -26,7 +28,7 @@ export const XrplSection = () => {
         if (isAddress(json.data)) {
           setEvmAddress(json.data);
         } else {
-          setEvmAddress("");
+          setEvmAddress(undefined);
         }
       }
     };

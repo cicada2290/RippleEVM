@@ -3,13 +3,15 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { isValidAddress } from "xrpl";
-import { UserDetail } from "../components/UserDetail/UserDetail";
+import { UserDetail } from "../components/UserDetail";
 
 export const EvmSection = () => {
-  const [xrplAddress, setXrplAddress] = useState<string | null>(null);
+  const [xrplAddress, setXrplAddress] = useState<string | null | undefined>(
+    null,
+  );
 
   const params = useParams();
-  const evmAddress = params?.address as unknown as string;
+  const evmAddress = params?.address as unknown as `0x${string}`;
 
   useEffect(() => {
     const fetchXrplAddress = async () => {
@@ -18,7 +20,7 @@ export const EvmSection = () => {
           `/api/user/xrpl-address?evmAddress=${params.address}`,
         );
         if (!response.ok) {
-          setXrplAddress("");
+          setXrplAddress(undefined);
           return;
         }
 
@@ -26,7 +28,7 @@ export const EvmSection = () => {
         if (isValidAddress(json.data)) {
           setXrplAddress(json.data);
         } else {
-          setXrplAddress("");
+          setXrplAddress(undefined);
         }
       }
     };

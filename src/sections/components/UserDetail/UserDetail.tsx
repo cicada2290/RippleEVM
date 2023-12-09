@@ -1,5 +1,6 @@
 "use client";
 
+import { ExtendedSkeleton } from "@/components/ExtendedSkeleton";
 import { NETWORKS } from "@/data/const/networks";
 import { Network } from "@/scripts/types/Network";
 import styles from "@/styles/sections/components/UserDetail/UserDetail.module.css";
@@ -13,22 +14,22 @@ import {
 } from "@nextui-org/react";
 import { fetchBalance } from "@wagmi/core";
 import { FC, useEffect, useState } from "react";
-import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { Client } from "xrpl";
 
-const connector = new MetaMaskConnector();
-
 type Props = {
-  evmAddress: `0x${string}` | null;
-  xrplAddress: string | null;
+  evmAddress: `0x${string}` | null | undefined;
+  xrplAddress: string | null | undefined;
 };
 export const UserDetail: FC<Props> = ({ evmAddress, xrplAddress }) => {
   const [balances, setBalances] = useState<
-    { network: Network; balance: number | null }[]
+    { network: Network; balance: number | null; isUndefined: boolean }[]
   >(
     NETWORKS.map((network) => ({
       network,
       balance: null,
+      isUndefined:
+        (evmAddress === undefined && network.type === "evm") ||
+        (xrplAddress === undefined && network.type === "xrpl"),
     })),
   );
 
@@ -46,11 +47,13 @@ export const UserDetail: FC<Props> = ({ evmAddress, xrplAddress }) => {
                 return {
                   network,
                   balance: Number(response.formatted),
+                  isUndefined: false,
                 };
               } else {
                 return {
                   balance: null,
                   network,
+                  isUndefined: true,
                 };
               }
             default:
@@ -64,17 +67,20 @@ export const UserDetail: FC<Props> = ({ evmAddress, xrplAddress }) => {
                   return {
                     balance: Number(xrplBalance),
                     network,
+                    isUndefined: false,
                   };
                 } catch (e: any) {
                   return {
                     balance: 0,
                     network,
+                    isUndefined: false,
                   };
                 }
               } else {
                 return {
                   balance: null,
                   network,
+                  isUndefined: true,
                 };
               }
           }
@@ -92,23 +98,35 @@ export const UserDetail: FC<Props> = ({ evmAddress, xrplAddress }) => {
       <div className={styles["addresses-container"]}>
         <div className={styles["address-container"]}>
           <Image src="/images/logo/ethereum-eth-logo.svg" alt="Ethereum" />
-          <Link
-            href={`https://sepolia.etherscan.io/address/${evmAddress}`}
-            isExternal={true}
-            showAnchorIcon={true}
-          >
-            {evmAddress}
-          </Link>
+          {evmAddress === undefined ? (
+            <>未登録</>
+          ) : evmAddress === null ? (
+            <ExtendedSkeleton />
+          ) : (
+            <Link
+              href={`https://sepolia.etherscan.io/address/${evmAddress}`}
+              isExternal={true}
+              showAnchorIcon={true}
+            >
+              {evmAddress}
+            </Link>
+          )}
         </div>
         <div className={styles["address-container"]}>
           <Image src="/images/logo/x.svg" alt="Ethereum" />
-          <Link
-            href={`https://testnet.xrpl.org/accounts/${xrplAddress}`}
-            isExternal={true}
-            showAnchorIcon={true}
-          >
-            {xrplAddress}
-          </Link>
+          {xrplAddress === undefined ? (
+            <>未登録</>
+          ) : xrplAddress === null ? (
+            <ExtendedSkeleton />
+          ) : (
+            <Link
+              href={`https://testnet.xrpl.org/accounts/${xrplAddress}`}
+              isExternal={true}
+              showAnchorIcon={true}
+            >
+              {xrplAddress}
+            </Link>
+          )}
         </div>
       </div>
       <Divider />
@@ -125,7 +143,9 @@ export const UserDetail: FC<Props> = ({ evmAddress, xrplAddress }) => {
                     {balance.network.name}
                   </div>
                   <div>
-                    {balance.balance === null ? (
+                    {balance.isUndefined ? (
+                      <>未登録</>
+                    ) : balance.balance === null ? (
                       <Skeleton className={styles["balance-skeleton"]} />
                     ) : (
                       `${balance.balance} ${balance.network.currency}`
