@@ -4,12 +4,12 @@ export type Network = {
   type: "evm" | "xrpl";
   currency: string;
 } & (
-  | {
+    | {
       type: "evm";
       chainId: number;
     }
-  | {
+    | {
       type: "xrpl";
       url: string;
     }
-);
+  );

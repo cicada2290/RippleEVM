@@ -7,7 +7,8 @@ export default async function handler(
 ) {
   const { xrplAddress } = req.query;
   if (!xrplAddress) {
-    return res.status(400).json({ error: "Missing evmAddress" });
+    res.status(400).json({ error: "Missing evmAddress" });
+    return;
   }
 
   const data = await prisma.address.findUnique({

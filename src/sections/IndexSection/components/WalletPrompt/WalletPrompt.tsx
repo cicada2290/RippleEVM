@@ -1,14 +1,9 @@
 "use client";
 
-import { networkAtom } from "@/components/atoms";
-import { NETWORKS } from "@/data/const/networks";
 import styles from "@/styles/sections/IndexSection/components/WalletPrompt/WalletPrompt.module.css";
 import { Button, Chip, Input } from "@nextui-org/react";
-import { HDNodeWallet, Mnemonic } from "ethers";
-import { useAtom } from "jotai";
 import { useRouter } from "next/navigation";
-import { FC, FormEventHandler, useEffect, useMemo, useState } from "react";
-import { Client, Wallet } from "xrpl";
+import { FC, FormEventHandler, useState } from "react";
 
 type Props = {
   evmAddress: string;
@@ -16,131 +11,52 @@ type Props = {
 export const WalletPrompt: FC<Props> = ({ evmAddress }) => {
   const router = useRouter();
 
-  const [network, setNetwork] = useAtom(networkAtom);
-
-  const [mnemonic, setMnemonic] = useState([
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-  ]);
-  const [arePrivateKeysEqual, setArePrivateKeysEqual] = useState<
-    boolean | null
-  >(null);
+  const [privateKey, setPrivateKey] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  const isMnemonicInvalid = useMemo(() => {
-    if (mnemonic.every((word) => word !== "")) {
-      return !Mnemonic.isValidMnemonic(mnemonic.join(" "));
-    }
-
-    return false;
-  }, [mnemonic]);
+  const [error, setError] = useState("");
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
 
-    const mnemonicString = mnemonic.join(" ");
-    const wallet = Wallet.fromMnemonic(mnemonicString, {
-      derivationPath: "m/44'/60'/0'/0/0",
-    });
-    const evmMnemonic = Mnemonic.fromPhrase(mnemonicString);
-    const evmWallet = HDNodeWallet.fromMnemonic(evmMnemonic);
+    setError("");
+    setIsLoading(true);
 
-    if (
-      `0X${wallet.publicKey.toUpperCase()}` !==
-      evmWallet.publicKey.toUpperCase()
-    ) {
-      setArePrivateKeysEqual(false);
-    } else if (network.type === "xrpl") {
-      try {
-        setArePrivateKeysEqual(true);
-
-        setIsLoading(true);
-
-        const client = new Client(network.url);
-        await client.connect();
-        const fundResponse = await client.fundWallet(wallet);
-        if (fundResponse.balance <= 0) {
-          throw new Error(
-            "XRPLウォレットのアドレスにXRPを送金できませんでした",
-          );
-        }
-        await client.disconnect();
-
-        const addResponse = await fetch(
-          `/api/user/add-address?evmAddress=${evmAddress}&xrplAddress=${wallet.address}`,
-        );
-        if (!addResponse.ok) {
-          throw new Error(
-            "XRPLウォレットのアドレスをデータベースに追加できませんでした",
-          );
-        }
-
-        setIsLoading(false);
-
-        router.refresh();
-      } catch (e: any) {
-        console.error(e.message);
-      }
+    const response = await fetch(
+      `api/user/generate-wallets?privateKey=${privateKey}&evmAddress=${evmAddress}`,
+    );
+    const json = await response.json();
+    if (json.error) {
+      setError(json.error);
     }
+
+    setIsLoading(false);
+
+    router.refresh();
   };
-
-  useEffect(() => {
-    if (network.type !== "xrpl") {
-      setNetwork(NETWORKS[0]);
-    }
-  }, [network.type, setNetwork]);
 
   return (
     <div className={styles.container}>
       <div>
         EVMウォレット <Chip>{evmAddress.slice(0, 5)}...</Chip>{" "}
-        のリカバリーフレーズを入力してください
+        の秘密鍵を入力してください
       </div>
       <form className={styles.form} onSubmit={handleSubmit}>
-        <div className={styles["mnemonic-inputs"]}>
-          {[...Array(12).keys()].map((i) => (
-            <Input
-              key={i}
-              label={i + 1}
-              isInvalid={isMnemonicInvalid}
-              onChange={(event) => {
-                const newMnemonic = [...mnemonic];
-                newMnemonic[i] = event.target.value;
-                setMnemonic(newMnemonic);
-
-                if (arePrivateKeysEqual === false) {
-                  setArePrivateKeysEqual(null);
-                }
-              }}
-            />
-          ))}
+        <div className={styles["private-key-input"]}>
+          <Input
+            label="秘密鍵"
+            isInvalid={!!error}
+            onChange={(event) => {
+              setPrivateKey(event.target.value);
+            }}
+          />
         </div>
-        {isMnemonicInvalid && (
-          <div className="text-danger">リカバリーフレーズが不正です</div>
-        )}
-        {arePrivateKeysEqual === false && (
-          <div className="text-danger">
-            EVMウォレットとXRPLウォレットの公開鍵が一致しません
-          </div>
-        )}
+        {error && <div className="text-danger">{error}</div>}
         <Button
           isLoading={isLoading}
           type="submit"
           color="primary"
           size="lg"
-          isDisabled={
-            !mnemonic.every((word) => word !== "") || isMnemonicInvalid
-          }
+          isDisabled={privateKey.length !== 64 || isLoading}
           className={styles["submit-button"]}
         >
           インポート
