@@ -1,21 +1,20 @@
 import { NETWORKS } from "@/data/const/networks";
 import { prisma } from "@/scripts/prisma/prisma";
-import { Wallet as EvmWallet, isAddress } from "ethers";
+import { HDNodeWallet, Mnemonic, isAddress } from "ethers";
 import type { NextApiRequest, NextApiResponse } from "next";
-import secp256k1 from "secp256k1";
 import { Client, Wallet as XrplWallet } from "xrpl";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const { privateKey, evmAddress: givenEvmAddress } = req.query;
-  if (!privateKey) {
-    res.status(400).json({ error: "privateKeyパラメーターがありません" });
+  const { mnemonic, evmAddress: givenEvmAddress } = req.query;
+  if (!mnemonic) {
+    res.status(400).json({ error: "mnemonicパラメーターがありません" });
     return;
   }
-  if (Array.isArray(privateKey)) {
-    res.status(400).json({ error: "privateKeyパラメーターが不正です" });
+  if (Array.isArray(mnemonic) || !Mnemonic.isValidMnemonic(mnemonic)) {
+    res.status(400).json({ error: "mnemonicパラメーターが不正です" });
     return;
   }
   if (!givenEvmAddress) {
@@ -28,16 +27,33 @@ export default async function handler(
   }
 
   try {
-    const evmWallet = new EvmWallet(privateKey);
-    const publicKey = Array.from(
-      secp256k1.publicKeyCreate(
-        Buffer.from(evmWallet.privateKey.slice(2), "hex"),
-        false,
-      ),
-    )
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-    const xrplWallet = new XrplWallet(publicKey, privateKey);
+    let evmWallet = undefined;
+    let xrplWallet = undefined;
+    for (let i = 0; i < 100; i++) {
+      const derivationPath = `m/44'/60'/0'/0/${i}`;
+      const evmMnemonic = Mnemonic.fromPhrase(mnemonic);
+      const _evmWallet = HDNodeWallet.fromMnemonic(evmMnemonic, derivationPath);
+      const _xrplWallet = XrplWallet.fromMnemonic(mnemonic, {
+        derivationPath,
+      });
+
+      if (_evmWallet.address === givenEvmAddress) {
+        evmWallet = _evmWallet;
+        xrplWallet = _xrplWallet;
+        break;
+      }
+    }
+    if (!evmWallet || !xrplWallet) {
+      res.status(400).json({ error: "evmAddressが不正です" });
+      return;
+    }
+    if (
+      evmWallet.publicKey.slice(2).toLowerCase() !==
+      xrplWallet.publicKey.toLowerCase()
+    ) {
+      res.status(400).json({ error: "evmAddressが不正です" });
+      return;
+    }
 
     const xrplAddress = xrplWallet.address;
     const evmAddress = evmWallet.address;
@@ -68,11 +84,12 @@ export default async function handler(
         xrpl_address: xrplAddress,
       },
     });
+
     await prisma.secret.create({
       data: {
         evm_address: evmAddress,
         xrpl_address: xrplAddress,
-        private_key: privateKey,
+        private_key: xrplWallet.privateKey,
       },
     });
 

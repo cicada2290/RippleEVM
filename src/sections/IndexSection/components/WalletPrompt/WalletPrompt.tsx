@@ -11,7 +11,7 @@ type Props = {
 export const WalletPrompt: FC<Props> = ({ evmAddress }) => {
   const router = useRouter();
 
-  const [privateKey, setPrivateKey] = useState("");
+  const [mnemonic, setMnemonic] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -22,31 +22,31 @@ export const WalletPrompt: FC<Props> = ({ evmAddress }) => {
     setIsLoading(true);
 
     const response = await fetch(
-      `api/user/generate-wallets?privateKey=${privateKey}&evmAddress=${evmAddress}`,
+      `api/user/generate-wallets?mnemonic=${mnemonic}&evmAddress=${evmAddress}`,
     );
     const json = await response.json();
     if (json.error) {
       setError(json.error);
+      setIsLoading(false);
+    } else {
+      setIsLoading(false);
+      router.refresh();
     }
-
-    setIsLoading(false);
-
-    router.refresh();
   };
 
   return (
     <div className={styles.container}>
       <div>
         EVMウォレット <Chip>{evmAddress.slice(0, 5)}...</Chip>{" "}
-        の秘密鍵を入力してください
+        のリカバリーフレーズを入力してください
       </div>
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles["private-key-input"]}>
           <Input
-            label="秘密鍵"
+            label="リカバリーフレーズ"
             isInvalid={!!error}
             onChange={(event) => {
-              setPrivateKey(event.target.value);
+              setMnemonic(event.target.value);
             }}
           />
         </div>
@@ -56,7 +56,7 @@ export const WalletPrompt: FC<Props> = ({ evmAddress }) => {
           type="submit"
           color="primary"
           size="lg"
-          isDisabled={privateKey.length !== 64 || isLoading}
+          isDisabled={!mnemonic || isLoading}
           className={styles["submit-button"]}
         >
           インポート

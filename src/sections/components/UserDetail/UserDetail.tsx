@@ -13,6 +13,7 @@ import {
   Skeleton,
 } from "@nextui-org/react";
 import { fetchBalance } from "@wagmi/core";
+import { useSession } from "next-auth/react";
 import { FC, useEffect, useState } from "react";
 import { Client } from "xrpl";
 
@@ -21,6 +22,8 @@ type Props = {
   xrplAddress: string | null | undefined;
 };
 export const UserDetail: FC<Props> = ({ evmAddress, xrplAddress }) => {
+  const { data: session } = useSession();
+
   const [balances, setBalances] = useState<
     { network: Network; balance: number | null | undefined }[]
   >(
@@ -29,6 +32,37 @@ export const UserDetail: FC<Props> = ({ evmAddress, xrplAddress }) => {
       balance: null,
     })),
   );
+
+  const handlePayment = async (network: Network) => {
+    const { evmAddress: userEvmAddress, xrplAddress: userXrplAddress } = (
+      session as Session
+    )?.user;
+    const privateKeyResponse = await fetch(
+      `/api/user/private-key?${
+        userEvmAddress
+          ? `evmAddress=${userEvmAddress}`
+          : `xrplAddress=${userXrplAddress}`
+      }`,
+    );
+    const privateKey = (await privateKeyResponse.json()).data;
+
+    if (network.type === "xrpl") {
+      const client = new Client(network.url);
+      await client.connect();
+
+      const transaction = {
+        TransactionType: "Payment",
+        Account: userXrplAddress,
+        Amount: "1000000",
+        Destination: xrplAddress,
+      };
+      const prepared = await client.autofill(transaction);
+      const signed = client.sign(prepared.txJSON, privateKey);
+      const result = await client.submit(signed.signedTransaction);
+
+      await client.disconnect();
+    }
+  };
 
   useEffect(() => {
     const fetchBalances = async () => {
@@ -139,7 +173,12 @@ export const UserDetail: FC<Props> = ({ evmAddress, xrplAddress }) => {
                   </div>
                 </div>
                 <div>
-                  <Button onPress={async () => {}}>送金</Button>
+                  <Button
+                    color="primary"
+                    onPress={() => handlePayment(balance.network)}
+                  >
+                    送金
+                  </Button>
                 </div>
               </div>
             ))}
