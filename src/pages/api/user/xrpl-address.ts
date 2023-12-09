@@ -1,4 +1,4 @@
-import { supabase } from "@/scripts/supabase/client";
+import { prisma } from "@/scripts/prisma/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -10,10 +10,9 @@ export default async function handler(
     return res.status(400).json({ error: "Missing evmAddress" });
   }
 
-  const { data } = await supabase
-    .from("addresses")
-    .select("xrpl_address")
-    .eq("evm_address", evmAddress)
-    .single();
+  const data = await prisma.addresses.findUnique({
+    where: { evm_address: evmAddress as string },
+    select: { xrpl_address: true },
+  });
   res.status(200).json({ data: data?.xrpl_address });
 }

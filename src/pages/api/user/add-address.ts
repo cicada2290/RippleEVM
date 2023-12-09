@@ -1,4 +1,4 @@
-import { supabase } from "@/scripts/supabase/client";
+import { prisma } from "@/scripts/prisma/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -13,13 +13,16 @@ export default async function handler(
     return res.status(400).json({ error: "Missing xrplAddress" });
   }
 
-  const { error } = await supabase
-    .from("addresses")
-    .insert([{ evm_address: evmAddress, xrpl_address: xrplAddress }]);
+  try {
+    const data = await prisma.addresses.create({
+      data: {
+        evm_address: evmAddress as string,
+        xrpl_address: xrplAddress as string,
+      },
+    });
 
-  if (error) {
-    return res.status(500).json({ error });
-  } else {
-    return res.status(200).json({ data: xrplAddress });
+    return res.status(200);
+  } catch (e: any) {
+    return res.status(500).json({ error: e.message });
   }
 }
