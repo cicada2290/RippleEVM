@@ -34,6 +34,9 @@ graph TB
 ```
 
 ## 開発
+1. `.env.example`と`.env.local.example`を参考に`.env`と`.env.local`を作成する
+
+2. 以下のコマンドを実行する
 ```bash
 pnpm install
 prisma migrate dev --name init
