@@ -8,7 +8,7 @@
     - 秘密鍵の取り回しは全てフロンテエンド・クライアント側で完結している
 - [x] EVMウォレットアドレスによるXRPLウォレットアドレスの検索
 - [x] XRPLウォレットアドレスによるEVMウォレットアドレスの検索
-- [ ] EVMウォレットアドレスによるXRPLウォレットアドレスへXRPの送金
+- [x] EVMウォレットアドレスによるXRPLウォレットアドレスへXRPの送金
 - [x] EVMチェーン（Sepolia, Mumbai）上のトークン残高表示
 
 ## UX
@@ -17,20 +17,19 @@
 
 ```mermaid
 graph TB
-    A[EVMウォレット秘密鍵] --> |公開鍵を生成|B[EVMアドレス]
-    B --> D[(DB)]
-    C[XRPLアドレス] --> D
+    A[EVMウォレットリカバリーフレーズ] --> B[EVMアドレス]
+    A --> C[XRPLアドレス]
+    B --> D[秘密鍵]
+    C --> D
+    C --> E[公開鍵]
+    D --> F[DBに保存]
+    E --> F
 ```
 
-### ウォレットアプリ
-
-```mermaid
-graph TB
-    A --> |メールアドレスとパスワード/SIWE|C
-    C --> |セッション|A
-    A[ログイン] --> D[アカウント]
-    D --> B[送金]
-    B --> |EVMアドレス|C[(DB)]
-    C --> |XRPLアドレス|B
-    B --> E[Tx発生]
+## 開発
+```bash
+pnpm install
+prisma migrate dev --name init
+prisma generate
+pnpm dev
 ```
