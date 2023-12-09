@@ -78,18 +78,19 @@ export default async function handler(
       }
     }
 
-    await prisma.address.create({
-      data: {
-        evm_address: evmAddress,
-        xrpl_address: xrplAddress,
-      },
-    });
-
     await prisma.secret.create({
       data: {
         evm_address: evmAddress,
         xrpl_address: xrplAddress,
+        public_key: xrplWallet.publicKey,
         private_key: xrplWallet.privateKey,
+      },
+    });
+
+    await prisma.address.create({
+      data: {
+        evm_address: evmAddress,
+        xrpl_address: xrplAddress,
       },
     });
 

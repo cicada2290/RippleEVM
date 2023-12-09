@@ -27,8 +27,11 @@ export const BalanceViewer: FC<Props> = ({ evmAddress, xrplAddress }) => {
           await client.connect();
 
           try {
-            const balance = await client.getXrpBalance(xrplAddress);
-            setBalance(Number(balance));
+            const balanceString = await client.getXrpBalance(xrplAddress);
+            const numBalance = Number(balanceString);
+            if (!isNaN(numBalance)) {
+              setBalance(numBalance);
+            }
           } catch (e: any) {
             setBalance(0);
             console.error(e.message);
@@ -59,7 +62,7 @@ export const BalanceViewer: FC<Props> = ({ evmAddress, xrplAddress }) => {
         target="_blank"
       >
         <Button radius="full" color="primary" variant="flat">
-          {network.type === "evm" ? evmAddress : xrplAddress}
+          {network.type === "xrpl" ? xrplAddress : evmAddress}
           <LinkIcon />
         </Button>
       </Link>

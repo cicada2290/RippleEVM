@@ -16,13 +16,6 @@ export const NETWORKS: Network[] = [
     currency: "XRP",
   },
   {
-    name: "AMM Devnet",
-    url: "wss://amm.devnet.rippletest.net:51233/",
-    explorer: "https://amm-devnet.xrpl.org/",
-    type: "xrpl",
-    currency: "XRP",
-  },
-  {
     name: "Sepolia",
     chainId: 11155111,
     explorer: "https://sepolia.etherscan.io/",

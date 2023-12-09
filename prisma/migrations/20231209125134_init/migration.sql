@@ -10,6 +10,7 @@ CREATE TABLE "Secret" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "evm_address" TEXT NOT NULL,
     "xrpl_address" TEXT NOT NULL,
+    "public_key" TEXT NOT NULL,
     "private_key" TEXT NOT NULL
 );
 

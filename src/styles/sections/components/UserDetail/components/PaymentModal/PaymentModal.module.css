@@ -1,0 +1,11 @@
+.balance-container {
+    display: flex;
+    align-items: center;
+    column-gap: 1rem;
+}
+
+.balance-skeleton {
+    width: 10rem;
+    height: 1rem;
+    border-radius: 0.25rem;
+}

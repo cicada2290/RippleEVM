@@ -21,5 +21,6 @@ model Secret {
   id           Int    @id @default(autoincrement())
   evm_address  String @unique
   xrpl_address String @unique
+  public_key   String
   private_key  String
 }
