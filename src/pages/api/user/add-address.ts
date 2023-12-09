@@ -14,12 +14,14 @@ export default async function handler(
   }
 
   try {
-    const data = await prisma.addresses.create({
+    await prisma.address.create({
       data: {
         evm_address: evmAddress as string,
         xrpl_address: xrplAddress as string,
       },
     });
+
+    await prisma.secret.create({});
 
     return res.status(200);
   } catch (e: any) {

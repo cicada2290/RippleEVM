@@ -10,7 +10,7 @@ export default async function handler(
     return res.status(400).json({ error: "Missing evmAddress" });
   }
 
-  const data = await prisma.addresses.findUnique({
+  const data = await prisma.address.findUnique({
     where: { xrpl_address: xrplAddress as string },
     select: { evm_address: true },
   });

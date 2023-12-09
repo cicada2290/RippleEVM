@@ -11,7 +11,7 @@ export const XrplSection = () => {
   >(null);
 
   const params = useParams();
-  const xrplAddress = params?.address as unknown as string;
+  const xrplAddress = (params?.address ?? null) as string | null;
 
   useEffect(() => {
     const fetchEvmAddress = async () => {

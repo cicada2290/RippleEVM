@@ -22,14 +22,11 @@ type Props = {
 };
 export const UserDetail: FC<Props> = ({ evmAddress, xrplAddress }) => {
   const [balances, setBalances] = useState<
-    { network: Network; balance: number | null; isUndefined: boolean }[]
+    { network: Network; balance: number | null | undefined }[]
   >(
     NETWORKS.map((network) => ({
       network,
       balance: null,
-      isUndefined:
-        (evmAddress === undefined && network.type === "evm") ||
-        (xrplAddress === undefined && network.type === "xrpl"),
     })),
   );
 
@@ -47,13 +44,11 @@ export const UserDetail: FC<Props> = ({ evmAddress, xrplAddress }) => {
                 return {
                   network,
                   balance: Number(response.formatted),
-                  isUndefined: false,
                 };
               } else {
                 return {
-                  balance: null,
+                  balance: undefined,
                   network,
-                  isUndefined: true,
                 };
               }
             default:
@@ -67,20 +62,17 @@ export const UserDetail: FC<Props> = ({ evmAddress, xrplAddress }) => {
                   return {
                     balance: Number(xrplBalance),
                     network,
-                    isUndefined: false,
                   };
                 } catch (e: any) {
                   return {
                     balance: 0,
                     network,
-                    isUndefined: false,
                   };
                 }
               } else {
                 return {
-                  balance: null,
+                  balance: undefined,
                   network,
-                  isUndefined: true,
                 };
               }
           }
@@ -98,35 +90,31 @@ export const UserDetail: FC<Props> = ({ evmAddress, xrplAddress }) => {
       <div className={styles["addresses-container"]}>
         <div className={styles["address-container"]}>
           <Image src="/images/logo/ethereum-eth-logo.svg" alt="Ethereum" />
-          {evmAddress === undefined ? (
-            <>未登録</>
-          ) : evmAddress === null ? (
+          {evmAddress === null ? (
             <ExtendedSkeleton />
           ) : (
             <Link
               href={`https://sepolia.etherscan.io/address/${evmAddress}`}
               isExternal={true}
-              showAnchorIcon={true}
+              showAnchorIcon={!!evmAddress}
+              isDisabled={!evmAddress}
             >
-              {evmAddress}
+              {evmAddress || "未登録"}
             </Link>
           )}
         </div>
         <div className={styles["address-container"]}>
           <Image src="/images/logo/x.svg" alt="Ethereum" />
-          {xrplAddress === undefined ? (
-            <>未登録</>
-          ) : xrplAddress === null ? (
-            <ExtendedSkeleton />
-          ) : (
+          {
             <Link
               href={`https://testnet.xrpl.org/accounts/${xrplAddress}`}
               isExternal={true}
-              showAnchorIcon={true}
+              showAnchorIcon={!!xrplAddress}
+              isDisabled={!xrplAddress}
             >
-              {xrplAddress}
+              {xrplAddress || "未登録"}
             </Link>
-          )}
+          }
         </div>
       </div>
       <Divider />
@@ -143,12 +131,10 @@ export const UserDetail: FC<Props> = ({ evmAddress, xrplAddress }) => {
                     {balance.network.name}
                   </div>
                   <div>
-                    {balance.isUndefined ? (
-                      <>未登録</>
-                    ) : balance.balance === null ? (
+                    {balance.balance === null ? (
                       <Skeleton className={styles["balance-skeleton"]} />
                     ) : (
-                      `${balance.balance} ${balance.network.currency}`
+                      `${balance.balance || 0} ${balance.network.currency}`
                     )}
                   </div>
                 </div>

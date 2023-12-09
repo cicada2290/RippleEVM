@@ -1,4 +1,5 @@
 import { networkAtom } from "@/components/atoms";
+import { NETWORKS } from "@/data/const/networks";
 import styles from "@/styles/components/Header/components/SignInLink/SignInLink.module.css";
 import {
   Avatar,
@@ -21,61 +22,71 @@ export const SignInLink = () => {
   const { data: session, status } = useSession();
 
   if (session?.user) {
+    const { evmAddress, xrplAddress } = (session as Session).user;
+
     return (
-      <div>
-        <Dropdown>
-          <DropdownTrigger>
+      <Dropdown>
+        <DropdownTrigger>
+          <div>
             <Avatar
               className={styles.avatar}
               src={session.user?.image ?? undefined}
               isFocusable={true}
             />
-          </DropdownTrigger>
-          <DropdownMenu className={styles["dropdown-menu"]}>
-            <DropdownItem key="evm">
-              <a
-                className={styles["dropdown-item"]}
-                href={`https://etherscan.io/address/${(session as Session).user
-                  ?.evmAddress}`}
-                target="_blank"
-              >
-                <Image
-                  src="/images/logo/ethereum-eth-logo.svg"
-                  alt="Ethereum"
-                />
-                <div>
-                  {(session as Session).user?.evmAddress}
-                  <LinkIcon />
-                </div>
-              </a>
-            </DropdownItem>
-            <DropdownItem key="xrpl">
-              <a
-                className={styles["dropdown-item"]}
-                href={path.join(
-                  network.explorer,
-                  `accounts/${(session as Session).user?.xrplAddress}`,
-                )}
-                target="_blank"
-              >
-                <Image src="/images/logo/x.svg" alt="Xrpl" />
-                <div className="flex">
-                  {(session as Session).user?.xrplAddress}
-                  <LinkIcon />
-                </div>
-              </a>
-            </DropdownItem>
-            <DropdownItem
-              key="delete"
-              className="text-danger"
-              color="danger"
-              onClick={() => signOut()}
+          </div>
+        </DropdownTrigger>
+        <DropdownMenu
+          className={styles["dropdown-menu"]}
+          disabledKeys={xrplAddress ? [] : ["xrpl"]}
+        >
+          <DropdownItem key="evm">
+            <a
+              className={styles["dropdown-item"]}
+              href={path.join(
+                network.type === "evm"
+                  ? network.explorer || ""
+                  : NETWORKS.find((n) => n.type === "evm")!.explorer,
+                "address",
+                evmAddress,
+              )}
+              target="_blank"
             >
-              ログアウト
-            </DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
-      </div>
+              <Image src="/images/logo/ethereum-eth-logo.svg" alt="Ethereum" />
+              <div>
+                {evmAddress}
+                <LinkIcon />
+              </div>
+            </a>
+          </DropdownItem>
+          <DropdownItem key="xrpl">
+            <a
+              className={styles["dropdown-item"]}
+              href={path.join(
+                network.type === "xrpl"
+                  ? network.explorer || ""
+                  : NETWORKS.find((n) => n.type === "xrpl")!.explorer,
+                "accounts",
+                xrplAddress || "",
+              )}
+              target="_blank"
+            >
+              <Image src="/images/logo/x.svg" alt="Xrpl" />
+              <div className="flex">
+                {xrplAddress || "未登録"}
+                {xrplAddress && <LinkIcon />}
+              </div>
+            </a>
+          </DropdownItem>
+          <DropdownItem
+            key="delete"
+            className="text-danger"
+            color="danger"
+            onClick={() => signOut()}
+          >
+            ログアウト
+          </DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
     );
   }
 
