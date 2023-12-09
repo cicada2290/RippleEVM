@@ -1,18 +1,18 @@
 .avatar {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .dropdown-item {
-    display: flex;
-    align-items: center;
-    column-gap: 0.5rem;
+  display: flex;
+  align-items: center;
+  column-gap: 0.5rem;
 }
 
 .dropdown-item > div {
-    display: flex;
+  display: flex;
 }
 
 .dropdown-item img {
-    width: 1.2rem;
-    height: 1.2rem;
+  width: 1.2rem;
+  height: 1.2rem;
 }

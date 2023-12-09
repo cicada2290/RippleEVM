@@ -1,5 +1,5 @@
-const organizeImports = require('prettier-plugin-organize-imports');
+const organizeImports = require("prettier-plugin-organize-imports");
 
 module.exports = {
-    plugins: [organizeImports],
+  plugins: [organizeImports],
 };

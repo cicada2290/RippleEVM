@@ -3,10 +3,20 @@
 import { NETWORKS } from "@/data/const/networks";
 import { Network } from "@/scripts/types/Network";
 import styles from "@/styles/sections/components/UserDetail/UserDetail.module.css";
-import { Card, Divider, Image, Link, Skeleton } from "@nextui-org/react";
+import {
+  Button,
+  Card,
+  Divider,
+  Image,
+  Link,
+  Skeleton,
+} from "@nextui-org/react";
 import { fetchBalance } from "@wagmi/core";
 import { FC, useEffect, useState } from "react";
+import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { Client } from "xrpl";
+
+const connector = new MetaMaskConnector();
 
 type Props = {
   evmAddress: `0x${string}` | null;
@@ -106,16 +116,24 @@ export const UserDetail: FC<Props> = ({ evmAddress, xrplAddress }) => {
         <Card>
           <div className={styles["balances"]}>
             {balances.map((balance) => (
-              <div key={balance.network.name}>
-                <div className={styles["network-name"]}>
-                  {balance.network.name}
+              <div
+                key={balance.network.name}
+                className={styles["balance-container"]}
+              >
+                <div>
+                  <div className={styles["network-name"]}>
+                    {balance.network.name}
+                  </div>
+                  <div>
+                    {balance.balance === null ? (
+                      <Skeleton className={styles["balance-skeleton"]} />
+                    ) : (
+                      `${balance.balance} ${balance.network.currency}`
+                    )}
+                  </div>
                 </div>
                 <div>
-                  {balance.balance === null ? (
-                    <Skeleton className={styles["balance-skeleton"]} />
-                  ) : (
-                    `${balance.balance} ${balance.network.currency}`
-                  )}
+                  <Button onPress={async () => {}}>送金</Button>
                 </div>
               </div>
             ))}
