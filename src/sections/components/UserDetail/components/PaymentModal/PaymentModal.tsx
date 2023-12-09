@@ -14,7 +14,9 @@ import {
   ModalHeader,
   Skeleton,
 } from "@nextui-org/react";
-import { connect, fetchBalance } from "@wagmi/core";
+import { fetchBalance } from "@wagmi/core";
+import { Wallet, parseEther } from "ethers";
+import { JsonRpcProvider } from "ethers/providers";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import path from "path";
@@ -103,10 +105,17 @@ export const PaymentModal: FC<Props> = ({
         return;
       }
 
+      const provider = new JsonRpcProvider(network.rpc);
+      const wallet = new Wallet(`0x${privateKey.slice(2)}`, provider);
+      const tx = await wallet.sendTransaction({
+        to: evmAddress,
+        value: parseEther(amount),
+      });
+
+      window.open(path.join(network.explorer, "tx", tx.hash), "_blank");
     }
 
     setIsSending(false);
-    router.refresh();
   };
 
   useEffect(() => {
@@ -169,8 +178,11 @@ export const PaymentModal: FC<Props> = ({
                     label="送金額"
                     onChange={(e) => {
                       const value = e.target.value;
+                      const numValue = Number(value);
                       setAmount(
-                        value.includes(".") ? value : Number(value).toString(),
+                        value.includes(".") || isNaN(numValue)
+                          ? value
+                          : Number(value).toString(),
                       );
                     }}
                     value={amount?.toString()}
