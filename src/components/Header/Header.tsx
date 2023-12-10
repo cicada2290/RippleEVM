@@ -21,7 +21,7 @@ export const Header = () => {
       </NavbarBrand>
       <NavbarContent>
         <NavbarItem>
-          <Link href="/verify">XRPL/EVM認証</Link>
+          <Link href="/verify">XRPL/EVM検証</Link>
         </NavbarItem>
         <SearchBox />
         <NetworkSelector />
