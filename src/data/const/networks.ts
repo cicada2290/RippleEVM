@@ -21,6 +21,6 @@ export const NETWORKS: Network[] = [
     explorer: "https://sepolia.etherscan.io/",
     type: "evm",
     currency: "ETH",
-    rpc: "https://rpc.sepolia.org",
+    url: "https://rpc.sepolia.org",
   },
 ] as const;

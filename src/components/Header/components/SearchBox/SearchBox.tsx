@@ -24,6 +24,7 @@ export const SearchBox = () => {
       color="primary"
       variant="faded"
       labelPlacement="outside-left"
+      placeholder="アドレスを入力"
       endContent={<MagnifyingGlassIcon className={styles.icon} />}
       onChange={handleChange}
     />

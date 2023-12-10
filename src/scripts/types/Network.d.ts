@@ -11,6 +11,6 @@ export type Network = {
     | {
       type: "evm";
       chainId: number;
-      rpc: string;
+      url: string;
     }
   );

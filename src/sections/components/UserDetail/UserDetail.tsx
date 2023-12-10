@@ -2,7 +2,7 @@
 
 import { ExtendedSkeleton } from "@/components/ExtendedSkeleton";
 import { NETWORKS } from "@/data/const/networks";
-import { fetchBalances } from "@/scripts/sections/UserDetail/fetchBalances";
+import { fetchBalances } from "@/scripts/sections/components/UserDetail/fetchBalances";
 import { Network } from "@/scripts/types/Network";
 import styles from "@/styles/sections/components/UserDetail/UserDetail.module.css";
 import {

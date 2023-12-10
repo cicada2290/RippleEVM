@@ -105,7 +105,7 @@ export const PaymentModal: FC<Props> = ({
         return;
       }
 
-      const provider = new JsonRpcProvider(network.rpc);
+      const provider = new JsonRpcProvider(network.url);
       const wallet = new Wallet(`0x${privateKey.slice(2)}`, provider);
       const tx = await wallet.sendTransaction({
         to: evmAddress,
