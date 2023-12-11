@@ -1,17 +1,12 @@
 "use client";
 
-import { NETWORKS } from "@/data/const/networks";
+import { getEvmPublicKey } from "@/scripts/sections/evm/get-evm-public-key";
+import { getXrplPublicKey } from "@/scripts/sections/xrpl/get-xrpl-public-key";
 import styles from "@/styles/sections/VerifySection/VerifySection.module.css";
 import { Button, Input } from "@nextui-org/react";
-import {
-  Transaction as EvmTransaction,
-  JsonRpcProvider,
-  SigningKey,
-  isAddress,
-} from "ethers";
+import { isAddress } from "ethers";
 import { useCallback, useState } from "react";
-import { decode, encode } from "ripple-binary-codec";
-import { Client, Transaction as XrplTransaction, isValidAddress } from "xrpl";
+import { isValidAddress } from "xrpl";
 
 export const VerifySection = () => {
   const [xrplAddress, setXrplAddress] = useState("");
@@ -39,37 +34,7 @@ export const VerifySection = () => {
     setErrorMessage("");
 
     try {
-      let xrplPublicKey;
-      for (const network of NETWORKS) {
-        if (network.type !== "xrpl") {
-          continue;
-        }
-
-        const client = new Client(network.url);
-        await client.connect();
-
-        const transactions = await client.request({
-          command: "account_tx",
-          account: xrplAddress,
-          ledger_index_min: -1,
-          ledger_index_max: -1,
-          limit: 100,
-        });
-
-        for (const transaction of transactions.result.transactions) {
-          const tx = transaction.tx;
-          if (tx && tx.Account === xrplAddress) {
-            const decoded = decode(encode(tx)) as unknown as XrplTransaction;
-            xrplPublicKey = decoded.SigningPubKey;
-
-            await client.disconnect();
-
-            break;
-          }
-        }
-
-        await client.disconnect();
-      }
+      const xrplPublicKey = await getXrplPublicKey(xrplAddress);
       if (!xrplPublicKey) {
         setErrorMessage(
           "XRPLウォレットのアドレスが不正か、このアドレスはまだ使われていません",
@@ -78,35 +43,7 @@ export const VerifySection = () => {
         return;
       }
 
-      let evmPublicKey;
-      for (const network of NETWORKS) {
-        if (network.type !== "evm") {
-          continue;
-        }
-
-        const transactionResponse = await fetch(
-          `/api/evm/get-transactions?chainId=${network.chainId}&address=${evmAddress}`,
-        );
-        if (!transactionResponse.ok) {
-          continue;
-        }
-
-        const transactions = (await transactionResponse.json()).data;
-        const provider = new JsonRpcProvider(network.url);
-        for (const transaction of transactions) {
-          const tx = await provider.getTransaction(transaction.hash);
-          if (!tx || tx.from !== evmAddress) {
-            continue;
-          }
-
-          const txObj = EvmTransaction.from(tx);
-          if (!txObj.fromPublicKey) {
-            continue;
-          }
-          evmPublicKey = SigningKey.computePublicKey(txObj.fromPublicKey);
-          break;
-        }
-      }
+      const evmPublicKey = await getEvmPublicKey(evmAddress);
       if (!evmPublicKey) {
         setErrorMessage(
           "EVMウォレットのアドレスが不正か、このアドレスはまだ使われていません",
