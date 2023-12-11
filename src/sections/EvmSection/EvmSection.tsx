@@ -42,7 +42,7 @@ export const EvmSection = () => {
       }
     };
 
-    fetchXrplAddress();
+    fetchXrplAddress().catch(console.error);
   }, [params]);
 
   return <UserDetail evmAddress={evmAddress} xrplAddress={xrplAddress} />;

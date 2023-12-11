@@ -31,7 +31,9 @@ export const XrplSection = () => {
         } else {
           const xrplPublicKey = await getXrplPublicKey(params.address);
           if (xrplPublicKey) {
-            setEvmAddress(computeAddress(`0x${xrplPublicKey}`) as `0x${string}`);
+            setEvmAddress(
+              computeAddress(`0x${xrplPublicKey}`) as `0x${string}`,
+            );
           } else {
             setEvmAddress(undefined);
           }
@@ -39,7 +41,7 @@ export const XrplSection = () => {
       }
     };
 
-    fetchEvmAddress();
+    fetchEvmAddress().catch(console.error);
   }, [params]);
 
   return <UserDetail evmAddress={evmAddress} xrplAddress={xrplAddress} />;
