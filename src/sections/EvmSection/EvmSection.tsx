@@ -42,6 +42,7 @@ export const EvmSection = () => {
       }
     };
 
+    setXrplAddress(null);
     fetchXrplAddress().catch(console.error);
   }, [params]);
 

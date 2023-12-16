@@ -23,6 +23,7 @@ export const getEvmPublicKey = async (evmAddress: string) => {
       const provider = new JsonRpcProvider(network.url);
       for (const transaction of transactions) {
         const tx = await provider.getTransaction(transaction.hash);
+        console.log(tx)
         if (!tx || tx.from !== evmAddress) {
           continue;
         }

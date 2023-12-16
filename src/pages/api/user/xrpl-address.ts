@@ -11,9 +11,13 @@ export default async function handler(
     return;
   }
 
-  const data = await prisma.address.findUnique({
-    where: { evm_address: evmAddress as string },
-    select: { xrpl_address: true },
-  });
-  res.status(200).json({ data: data?.xrpl_address });
+  try {
+    const data = await prisma.address.findUnique({
+      where: {evm_address: evmAddress as string},
+      select: {xrpl_address: true},
+    });
+    res.status(200).json({data: data?.xrpl_address});
+  } catch (e) {
+    res.status(200).json({data: null});
+  }
 }

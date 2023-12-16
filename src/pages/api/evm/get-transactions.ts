@@ -18,6 +18,10 @@ export default async function handler(
     res.status(400).json({ error: "Missing address" });
     return;
   }
+  if (!process.env.ETHERSCAN_API_KEY) {
+    res.status(500).json({ error: "Missing ETHERSCAN_API_KEY" });
+    return;
+  }
 
   let domain;
   switch (chainId) {
@@ -35,7 +39,7 @@ export default async function handler(
   const response = await fetch(
     path.join(
       domain,
-      `api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=${process.env.ETHERSCAN_API_KEY}`,
+      `api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=100&sort=asc&apikey=${process.env.ETHERSCAN_API_KEY}`,
     ),
   );
   const data = await response.json();
